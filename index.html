@@ -5,49 +5,38 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tattoo Match</title>
 <style>
-*{box-sizing:border-box} html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;font-family:Arial,sans-serif}
-body{touch-action:none;overscroll-behavior:none} #app{position:fixed;inset:0;display:flex;flex-direction:column}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;font-family:Arial,sans-serif}
+body{touch-action:none;overscroll-behavior:none}#app{position:fixed;inset:0;display:flex;flex-direction:column}
 #cameraArea{height:50%;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #camera{width:100%;height:100%;object-fit:contain;transform:scaleX(-1);background:#111}
-#matchArea{height:50%;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(115deg,#f31362,#ff385c 48%,#ff5a52);touch-action:none}
-#card{width:min(51vw,275px);height:min(32vh,344px);background:#fff;border-radius:28px;padding:11px 11px 12px;box-shadow:0 12px 34px #0004;display:flex;flex-direction:column;gap:8px;transition:transform .25s ease,opacity .25s ease;touch-action:none;will-change:transform}
-#photoWrap{flex:1;min-height:0;border-radius:21px;overflow:hidden;background:#eee}
+#matchArea{height:50%;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ff1f68,#ff4b55)}
+#card{width:min(51vw,275px);height:min(32vh,344px);background:#fff;border-radius:28px;padding:11px 11px 12px;box-shadow:0 12px 34px #0004;position:relative;will-change:transform,opacity}
+#photoWrap{height:calc(100% - 48px);min-height:0;border-radius:21px;overflow:hidden;background:#eee}
 #photo{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 #buttons{height:48px;display:flex;align-items:center;justify-content:center;gap:22px}
 .action{width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:0 3px 13px #0002;display:grid;place-items:center;font-size:25px;font-weight:900}
-#nope{color:#f22b64} #star{color:#19bfe8;font-size:23px} #like{color:#28e5a5}
+#nope{color:#f22b64}#star{color:#19bfe8;font-size:23px}#like{color:#28e5a5}
 .stamp{position:absolute;z-index:8;padding:5px 9px;border:4px solid;border-radius:7px;font-size:27px;font-weight:900;opacity:0;pointer-events:none}
-#likeStamp{top:12%;left:8%;color:#28e5a5;transform:rotate(-14deg)} #nopeStamp{top:12%;right:8%;color:#f22b64;transform:rotate(14deg)}
-#superStamp{left:50%;top:7%;color:#19bfe8;transform:translateX(-50%) rotate(-3deg)}
+#likeStamp{top:12%;left:8%;color:#28e5a5;transform:rotate(-14deg)}#nopeStamp{top:12%;right:8%;color:#f22b64;transform:rotate(14deg)}
+#superStamp{left:50%;top:7%;color:#19bfe8;transform:translateX(-50%) rotate(-3deg);font-size:19px}
 #start{position:fixed;inset:0;z-index:20;background:#111;color:#fff;display:grid;place-items:center;text-align:center;padding:28px}
-#start>div{max-width:420px} #start h1{font-size:34px;margin:0 0 12px} #start p{color:#bbb;line-height:1.4;margin:0 0 22px}
-#start button{border:0;border-radius:999px;padding:16px 24px;font-size:18px;font-weight:900} #status{margin-top:14px;color:#aaa;font-size:13px}
-</style></head>
-<body>
+#start>div{max-width:420px}#start h1{font-size:34px;margin:0 0 12px}#start p{color:#bbb;line-height:1.4;margin:0 0 22px}
+#start button{border:0;border-radius:999px;padding:16px 24px;font-size:18px;font-weight:900}#status{margin-top:14px;color:#aaa;font-size:14px}
+</style></head><body>
 <div id="app"><div id="cameraArea"><video id="camera" autoplay muted playsinline></video></div>
 <div id="matchArea"><div id="likeStamp" class="stamp">LIKE</div><div id="nopeStamp" class="stamp">NOPE</div><div id="superStamp" class="stamp">SUPER LIKE</div>
-<div id="card"><div id="photoWrap"><img id="photo" alt="Tatuagem"></div><div id="buttons">
-<button class="action" id="nope">×</button><button class="action" id="star">★</button><button class="action" id="like">♥</button>
-</div></div></div></div>
-<div id="start"><div><h1>Tattoo Match</h1><p>❌ passa, ♥ like e ★ super like. Arraste para esquerda, direita ou para cima.</p>
-<button id="cameraBtn">ATIVAR CÂMERA</button><div id="status"></div></div></div>
+<div id="card"><div id="photoWrap"><img id="photo" alt="Tatuagem"></div><div id="buttons"><button class="action" id="nope">×</button><button class="action" id="star">★</button><button class="action" id="like">♥</button></div></div></div></div>
+<div id="start"><div><h1>Tattoo Match</h1><p>Ative a câmera para começar.</p><button id="startBtn">Começar</button><div id="status"></div></div></div>
 <script>
-const images=["images/tattoo-01.jpg","images/tattoo-02.jpeg","images/tattoo-03.jpg","images/tattoo-04.jpg","images/tattoo-05.jpeg","images/tattoo-06.jpeg","images/tattoo-07.jpeg","images/tattoo-08.jpeg","images/tattoo-09.jpeg","images/tattoo-10.jpeg","images/tattoo-11.jpeg","images/tattoo-12.jpeg","images/tattoo-13.jpeg","images/tattoo-14.jpg","images/tattoo-15.jpeg"];
-const $=id=>document.getElementById(id),camera=$("camera"),card=$("card"),photo=$("photo"),start=$("start"),status=$("status"),
-likeStamp=$("likeStamp"),nopeStamp=$("nopeStamp"),superStamp=$("superStamp");
-let bag=[],busy=false,dragging=false,startX=0,startY=0,dx=0,dy=0;
-function shuffle(){bag=[...Array(images.length).keys()];for(let i=bag.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]]}}
-function stamps(a,b,c){likeStamp.style.opacity=a;nopeStamp.style.opacity=b;superStamp.style.opacity=c}
-function next(){if(!bag.length)shuffle();photo.src=images[bag.pop()];card.style.transition="none";card.style.transform="translate3d(0,0,0)";card.style.opacity="1";stamps(0,0,0);busy=false}
-function decide(dir){if(busy)return;busy=true;card.style.transition="transform .3s ease,opacity .3s ease";
-if(dir==="right"){stamps(1,0,0);card.style.transform="translate3d(125vw,0,0) rotate(18deg)"}
-if(dir==="left"){stamps(0,1,0);card.style.transform="translate3d(-125vw,0,0) rotate(-18deg)"}
-if(dir==="up"){stamps(0,0,1);card.style.transform="translate3d(0,-90vh,0) scale(.92)"}
-card.style.opacity=".3";setTimeout(next,320)}
-$("like").onclick=e=>{e.stopPropagation();decide("right")};$("nope").onclick=e=>{e.stopPropagation();decide("left")};$("star").onclick=e=>{e.stopPropagation();decide("up")};
-card.addEventListener("pointerdown",e=>{if(busy)return;e.preventDefault();dragging=true;startX=e.clientX;startY=e.clientY;dx=dy=0;card.setPointerCapture(e.pointerId);card.style.transition="none"},{passive:false});
-card.addEventListener("pointermove",e=>{if(!dragging||busy)return;e.preventDefault();dx=e.clientX-startX;dy=e.clientY-startY;let up=Math.max(0,-dy);card.style.transform=`translate3d(${dx}px,${dy}px,0) rotate(${dx/18}deg)`;if(up>Math.abs(dx)&&up>35)stamps(0,0,Math.min(1,(up-35)/70));else if(dx>35)stamps(Math.min(1,(dx-35)/70),0,0);else if(dx<-35)stamps(0,Math.min(1,(-dx-35)/70),0);else stamps(0,0,0)},{passive:false});
-function release(){if(!dragging||busy)return;dragging=false;if(-dy>85&&-dy>Math.abs(dx))return decide("up");if(dx>80)return decide("right");if(dx<-80)return decide("left");card.style.transition="transform .2s ease";card.style.transform="translate3d(0,0,0)";stamps(0,0,0)}
-card.addEventListener("pointerup",release);card.addEventListener("pointercancel",release);
-$("cameraBtn").onclick=async()=>{status.textContent="Abrindo câmera…";try{let s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});camera.srcObject=s;await camera.play();start.style.display="none";shuffle();next()}catch(e){status.textContent="Não foi possível abrir a câmera. Verifique a permissão do navegador."}};
+const tattoos=["images/tattoo-01.jpeg","images/tattoo-02.jpeg","images/tattoo-03.jpeg","images/tattoo-04.jpeg","images/tattoo-05.jpeg","images/tattoo-06.jpeg","images/tattoo-07.jpeg","images/tattoo-08.jpeg"];
+const photo=document.getElementById("photo"),card=document.getElementById("card"),likeStamp=document.getElementById("likeStamp"),nopeStamp=document.getElementById("nopeStamp"),superStamp=document.getElementById("superStamp");
+let bag=[],dragging=false,sx=0,sy=0,dx=0,dy=0;
+function refill(){bag=[...tattoos];for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]]}}
+function next(){if(!bag.length)refill();photo.src=bag.pop();card.style.transition="none";card.style.transform="translate(0,0) rotate(0)";card.style.opacity="1";[likeStamp,nopeStamp,superStamp].forEach(s=>s.style.opacity=0)}
+function act(type){let x=0,y=0,r=0,stamp;if(type==="like"){x=innerWidth*1.2;r=18;stamp=likeStamp}if(type==="nope"){x=-innerWidth*1.2;r=-18;stamp=nopeStamp}if(type==="super"){y=-innerHeight*.7;stamp=superStamp}stamp.style.opacity=1;card.style.transition="transform .28s ease,opacity .28s ease";card.style.transform=`translate(${x}px,${y}px) rotate(${r}deg)`;card.style.opacity=0;setTimeout(next,290)}
+card.addEventListener("pointerdown",e=>{dragging=true;sx=e.clientX;sy=e.clientY;dx=dy=0;card.setPointerCapture(e.pointerId);card.style.transition="none"});
+card.addEventListener("pointermove",e=>{if(!dragging)return;dx=e.clientX-sx;dy=e.clientY-sy;card.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`;likeStamp.style.opacity=dx>25?Math.min(dx/100,1):0;nopeStamp.style.opacity=dx<-25?Math.min(-dx/100,1):0;superStamp.style.opacity=dy<-25?Math.min(-dy/100,1):0});
+card.addEventListener("pointerup",()=>{if(!dragging)return;dragging=false;if(dx>80)act("like");else if(dx<-80)act("nope");else if(dy<-85)act("super");else{card.style.transition="transform .2s ease";card.style.transform="translate(0,0) rotate(0)";[likeStamp,nopeStamp,superStamp].forEach(s=>s.style.opacity=0)}});
+document.getElementById("like").onclick=()=>act("like");document.getElementById("nope").onclick=()=>act("nope");document.getElementById("star").onclick=()=>act("super");
+document.getElementById("startBtn").onclick=async()=>{const status=document.getElementById("status");try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});document.getElementById("camera").srcObject=stream;document.getElementById("start").style.display="none";next()}catch(e){status.textContent="Não foi possível acessar a câmera. Verifique a permissão do navegador."}};
 </script></body></html>
